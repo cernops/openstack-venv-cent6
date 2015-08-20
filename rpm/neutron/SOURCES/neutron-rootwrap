@@ -1,0 +1,7 @@
+#!/bin/bash
+
+venvdir="/opt/openstack/neutron/venv"
+source /opt/rh/python27/enable
+source $venvdir/bin/activate
+
+/opt/openstack/neutron/venv/bin/neutron-rootwrap $*

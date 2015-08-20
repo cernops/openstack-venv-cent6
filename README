@@ -1,0 +1,9 @@
+This repo contains a highly opinionated (to godaddy) spec file and other files that makes a venv packaged by anvil under python 2.7 software collections on Centos6/RHEL6 machine work with openstack kilo.
+
+Godaddy uses puppet to re-write most of the configuration files on every package deploy as such the spec file currently overwrites these files on every package update.  You can change this behavior faily simply in the spec.  I tried to model the spec to emulate (where it made sense) what RDO is doing with packages.  This is because godaddy uses upstream puppet modules that are built to work with the RDO packages.
+
+
+Godaddy is using this on a small number of compute nodes in production.  However, we are working on moving these nodes from cent6 -> cent7 so this repo may not be actively maintained once this is done.
+
+
+Please see the readme under each service under the rpm dir for instructions on tieing this together with an anvil packaged venv. 

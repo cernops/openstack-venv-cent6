@@ -1,0 +1,7 @@
+#!/bin/bash
+
+venvdir="/opt/openstack/nova/venv"
+source /opt/rh/python27/enable
+source $venvdir/bin/activate
+
+/opt/openstack/nova/venv/bin/nova-rootwrap-real $*

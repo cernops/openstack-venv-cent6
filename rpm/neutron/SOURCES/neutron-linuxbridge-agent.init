@@ -1,0 +1,95 @@
+
+n-linuxbridge-agent
+# chkconfig:   - 98 02
+# description: neutron-linuxbridge-agent server
+
+. /etc/rc.d/init.d/functions
+
+venvdir="/opt/openstack/neutron/venv"
+
+prog=openstack-neutron-linuxbridge-agent
+exec="$venvdir/bin/neutron-linuxbridge-agent"
+pidfile="/var/run/neutron/$prog.pid"
+daemon_user=neutron
+daemon_args=''
+
+[ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
+
+lockfile=/var/lock/subsys/$prog
+
+source /opt/rh/python27/enable
+source $venvdir/bin/activate
+
+start() {
+    [ -x $exec ] || exit 5
+    echo -n $"Starting $prog: "
+    daemon --user $daemon_user --pidfile $pidfile "$exec $daemon_args &>/dev/null & echo \$! > $pidfile"
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && touch $lockfile
+    return $retval
+
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc -p $pidfile $prog
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && rm -f $lockfile
+    return $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+reload() {
+    restart
+}
+
+force_reload() {
+    restart
+}
+
+rh_status() {
+    status -p $pidfile $prog
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+
+case "$1" in
+    start)
+        rh_status_q && exit 0
+        $1
+        ;;
+    stop)
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    reload)
+        rh_status_q || exit 7
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+        restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+        exit 2
+esac
+exit $?
