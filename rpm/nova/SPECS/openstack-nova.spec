@@ -1,6 +1,6 @@
 %global python_name nova
 %global daemon_prefix openstack-nova
-%global os_version 2015.1.0.3
+%global os_version 2015.1.0
 %global no_tests $no_tests
 %global tests_data_dir %{_datarootdir}/%{python_name}-tests
 
@@ -11,8 +11,8 @@
 
 Name:             openstack-nova
 Summary:          OpenStack Compute (nova)
-Version:          %{os_version}.gdkilo.0
-Release:          8
+Version:          %{os_version}
+Release:          0
 Epoch:            2
 
 Group:            Development/Languages

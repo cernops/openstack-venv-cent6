@@ -10,7 +10,7 @@
 
 %global python_name neutron
 %global daemon_prefix openstack-neutron
-%global os_version 2015.1.0.3
+%global os_version 2015.1.0
 %global no_tests $no_tests
 %global tests_data_dir %{_datarootdir}/%{python_name}-tests
 
@@ -19,8 +19,8 @@
 %endif
 
 Name:           openstack-neutron
-Version:        %{os_version}.gdkilo.0
-Release:        6
+Version:        %{os_version}
+Release:        0
 Epoch:          2
 Summary:        Virtual network service for OpenStack (neutron)
 
