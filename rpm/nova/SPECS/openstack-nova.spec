@@ -1,6 +1,6 @@
 %global python_name nova
 %global daemon_prefix openstack-nova
-%global os_version 2015.1.0
+%global os_version 2015.1.1
 %global no_tests $no_tests
 %global tests_data_dir %{_datarootdir}/%{python_name}-tests
 
@@ -12,7 +12,7 @@
 Name:             openstack-nova
 Summary:          OpenStack Compute (nova)
 Version:          %{os_version}
-Release:          0
+Release:          1
 Epoch:            2
 
 Group:            Development/Languages
@@ -60,6 +60,8 @@ Source53:         nova-sudoers
 Source54:         nova-rootwrap
 Source55:         policy.json
 Source56:         api-paste.ini
+Source57:         nova.conf
+Source58:         rootwrap.conf
 
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}
 
@@ -448,11 +450,17 @@ install -p -D -m 440 %{SOURCE53} %{buildroot}%{_sysconfdir}/sudoers.d/nova
 install -p -D -m 644 %{SOURCE51} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 
 # Install policy.json
-install -p -D -m 640 -o root -g nova %{SOURCE55} %{buildroot}%{_sysconfdir}/nova/policy.json
+install -p -D -m 640 %{SOURCE55} %{buildroot}%{_sysconfdir}/nova/policy.json
 
-#INstall api-paste.ini
-install -p -D -m 640 -o root -g nova %{SOURCE56} %{buildroot}%{_sysconfdir}/nova/api-paste.ini
- 
+#Install api-paste.ini
+install -p -D -m 640 %{SOURCE56} %{buildroot}%{_sysconfdir}/nova/api-paste.ini
+
+# Install nova.conf
+install -p -D -m 644 %{SOURCE57} %{buildroot}%{_sysconfdir}/nova/nova.conf
+
+# Install rootwrap.conf
+install -p -D -m 644 %{SOURCE58} %{buildroot}%{_sysconfdir}/nova/rootwrap.conf
+
 # Install pid directory
 install -d -m 755 %{buildroot}%{_localstatedir}/run/nova
 
@@ -498,12 +506,13 @@ mv -f /opt/openstack/%{python_name}/venv/bin/nova-rootwrap /opt/openstack/%{pyth
 
 %if ! 0%{?usr_only}
 %dir %{_sysconfdir}/nova
-#%config(noreplace) %attr(-, root, nova) %{_sysconfdir}/nova/*
 %config(noreplace) %{_sysconfdir}/logrotate.d/openstack-nova
 %config(noreplace) %{_sysconfdir}/sudoers.d/nova
 %config(noreplace) %{_sysconfdir}/polkit-1/localauthority/50-local.d/50-nova.pkla
-%attr(0640, root, nova) /etc/nova/policy.json
-%attr(0640, root, nova) /etc/nova/api-paste.ini
+%config(noreplace) %attr(0640, root, nova) /etc/nova/policy.json
+%config(noreplace) %attr(0640, root, nova) /etc/nova/api-paste.ini
+%config(noreplace) %attr(0640, root, nova) /etc/nova/nova.conf
+%config(noreplace) %attr(0640, root, nova) /etc/nova/rootwrap.conf
 %dir %attr(0755, nova, root) %{_localstatedir}/log/nova
 %dir %attr(0755, nova, root) %{_localstatedir}/lock/nova
 %dir %attr(0755, nova, root) %{_localstatedir}/run/nova
