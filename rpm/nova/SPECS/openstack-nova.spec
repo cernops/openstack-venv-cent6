@@ -13,7 +13,6 @@ Name:             openstack-nova
 Summary:          OpenStack Compute (nova)
 Version:          %{os_version}
 Release:          1
-Epoch:            2
 
 Group:            Development/Languages
 License:          ASL 2.0
@@ -67,13 +66,13 @@ BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}
 
 BuildArch:        noarch
 
-Requires:         %{name}-compute = %{epoch}:%{version}-%{release}
-Requires:         %{name}-cert = %{epoch}:%{version}-%{release}
-Requires:         %{name}-scheduler = %{epoch}:%{version}-%{release}
-Requires:         %{name}-api = %{epoch}:%{version}-%{release}
-Requires:         %{name}-network = %{epoch}:%{version}-%{release}
-Requires:         %{name}-objectstore = %{epoch}:%{version}-%{release}
-Requires:         %{name}-console = %{epoch}:%{version}-%{release}
+Requires:         %{name}-compute = %{version}-%{release}
+Requires:         %{name}-cert = %{version}-%{release}
+Requires:         %{name}-scheduler = %{version}-%{release}
+Requires:         %{name}-api = %{version}-%{release}
+Requires:         %{name}-network = %{version}-%{release}
+Requires:         %{name}-objectstore = %{version}-%{release}
+Requires:         %{name}-console = %{version}-%{release}
 
 %description
 OpenStack Compute (codename Nova) is open source software designed to
@@ -89,7 +88,7 @@ standard hardware configurations and seven major hypervisors.
 Summary:          Components common to all OpenStack services
 Group:            Applications/System
 
-Requires:         python-nova = %{epoch}:%{version}-%{release}
+Requires:         python-nova = %{version}-%{release}
 
 %if ! 0%{?usr_only}
 Requires(post):   chkconfig
@@ -116,7 +115,7 @@ between all the OpenStack nova services.
 Summary:          OpenStack Nova Virtual Machine control service
 Group:            Applications/System
 
-Requires:         %{name}-common = %{epoch}:%{version}-%{release}
+Requires:         %{name}-common = %{version}-%{release}
 Requires:         curl
 Requires:         iscsi-initiator-utils
 Requires:         iptables iptables-ipv6
@@ -155,7 +154,7 @@ This package contains the Nova service for controlling Virtual Machines.
 Summary:          OpenStack Nova Network control service
 Group:            Applications/System
 
-Requires:         %{name}-common = %{epoch}:%{version}-%{release}
+Requires:         %{name}-common = %{version}-%{release}
 Requires:         vconfig
 Requires:         radvd
 Requires:         bridge-utils
@@ -183,7 +182,7 @@ This package contains the Nova service for controlling networking.
 Summary:          OpenStack Nova VM distribution service
 Group:            Applications/System
 
-Requires:         %{name}-common = %{epoch}:%{version}-%{release}
+Requires:         %{name}-common = %{version}-%{release}
 
 %description scheduler
 OpenStack Compute (codename Nova) is open source software designed to
@@ -203,7 +202,7 @@ to run Virtual Machines in the cloud.
 Summary:          OpenStack Nova certificate management service
 Group:            Applications/System
 
-Requires:         %{name}-common = %{epoch}:%{version}-%{release}
+Requires:         %{name}-common = %{version}-%{release}
 
 %description cert
 OpenStack Compute (codename Nova) is open source software designed to
@@ -222,7 +221,7 @@ This package contains the Nova service for managing certificates.
 Summary:          OpenStack Nova API services
 Group:            Applications/System
 
-Requires:         %{name}-common = %{epoch}:%{version}-%{release}
+Requires:         %{name}-common = %{version}-%{release}
 
 %description api
 OpenStack Compute (codename Nova) is open source software designed to
@@ -241,7 +240,7 @@ This package contains the Nova services providing programmatic access.
 Summary:          OpenStack Nova Conductor services
 Group:            Applications/System
 
-Requires:         openstack-nova-common = %{epoch}:%{version}-%{release}
+Requires:         openstack-nova-common = %{version}-%{release}
 
 %description conductor
 OpenStack Compute (codename Nova) is open source software designed to
@@ -261,7 +260,7 @@ the compute service
 Summary:          OpenStack Nova simple object store service
 Group:            Applications/System
 
-Requires:         %{name}-common = %{epoch}:%{version}-%{release}
+Requires:         %{name}-common = %{version}-%{release}
 
 %description objectstore
 OpenStack Compute (codename Nova) is open source software designed to
@@ -280,7 +279,7 @@ This package contains the Nova service providing a simple object store.
 Summary:          OpenStack Nova console access services
 Group:            Applications/System
 
-Requires:         %{name}-common = %{epoch}:%{version}-%{release}
+Requires:         %{name}-common = %{version}-%{release}
 
 %description console
 OpenStack Compute (codename Nova) is open source software designed to
@@ -300,7 +299,7 @@ services to Virtual Machines.
 Summary:          OpenStack Nova Cells services
 Group:            Applications/System
 
-Requires:         openstack-nova-common = %{epoch}:%{version}-%{release}
+Requires:         openstack-nova-common = %{version}-%{release}
 
 %description cells
 OpenStack Compute (codename Nova) is open source software designed to
@@ -320,7 +319,7 @@ scaling and (geographic) distribution for compute services.
 Summary:          OpenStack Nova serial console access service
 Group:            Applications/System
 
-Requires:         openstack-nova-common = %{epoch}:%{version}-%{release}
+Requires:         openstack-nova-common = %{version}-%{release}
 
 %description serialproxy
 OpenStack Compute (codename Nova) is open source software designed to
