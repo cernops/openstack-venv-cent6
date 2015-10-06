@@ -478,6 +478,17 @@ install -p -D -m 555 %{SOURCE54} %{buildroot}%{_bindir}/nova-rootwrap
 %clean
 rm -rf %{buildroot}
 
+%pre common
+getent group nova >/dev/null || groupadd -r nova --gid 162
+if ! getent passwd nova >/dev/null; then
+  useradd -u 162 -r -g nova -G nova,nobody -d %{_sharedstatedir}/nova -s /sbin/nologin -c "OpenStack Nova Daemons" nova
+fi
+exit 0
+
+%pre compute
+usermod -a -G qemu nova
+exit 0
+
 %post
 if %{_sbindir}/selinuxenabled; then
     echo -e "\033[47m\033[1;31m***************************************************\033[0m"
