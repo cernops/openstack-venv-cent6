@@ -127,6 +127,7 @@ Requires:         libguestfs-mount >= 1.7.17
 %else
 #latest libguestfs-tools for cent7 doesn't provide requires for
 #libguestfs-mount
+Requires:         libguestfs-tools   >= 1.7.17
 Requires:         libguestfs-tools-c >= 1.7.17
 %endif
 # The fuse dependency should be added to libguestfs-mount

@@ -1,0 +1,17 @@
+Copy contents of ceilometer directory to rpmbuild dir:
+cp -R ceilometer/* /root/rpmbuild/
+
+Build venv via anvil:
+/home/anvil/smithy --venv-deploy-dir=/opt/openstack/ -p conf/personas/in-a-box/venv-all.yaml -o conf/origins/kilo-venv-2015.1.0.yaml -a prepare -j 1 --distros-patch=conf/distros/venv-patch.json
+
+Create source tarball:
+cd /home/openstack/ceilometer/venv
+mkdir ceilometer-<version> #example: ceilometer-2015.1.0.3
+cp ceilometer-<version>-<release>-venv.tar.gz ceilometer-<version> #example: ceilometer-2015.1.0.3-1-venv.tar.gz ceilometer-2015.1.0.3
+tar -zcvf ceilometer-<version>.tar.gz ceilometer-<version> #example: ceilometer-2015.1.0.3.tar.gz ceilometer-2015.1.0.3
+
+Copy it to the rpmbuild/Sources dir:
+cp ceilometer-<version>.tar.gz /root/rpmbuild/SOURCES/ #example: ceilometer-2015.1.0.3.tar.gz
+
+Build using the spec:
+rpmbuild -bb /root/rpmbuild/SPECS/openstack-ceilometer.spec
