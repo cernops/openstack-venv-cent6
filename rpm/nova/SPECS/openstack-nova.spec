@@ -1,3 +1,5 @@
+%define _binaries_in_noarch_packages_terminate_build   0
+
 %global python_name nova
 %global daemon_prefix openstack-nova
 %global os_version 2015.1.1
@@ -12,7 +14,7 @@
 Name:             openstack-nova
 Summary:          OpenStack Compute (nova)
 Version:          %{os_version}
-Release:          1
+Release:          1%{?dist}
 
 Group:            Development/Languages
 License:          ASL 2.0
@@ -62,12 +64,14 @@ Source56:         api-paste.ini
 Source57:         nova.conf
 Source58:         rootwrap.conf
 
-
 Source60:         api-metadata.filters
 Source61:         baremetal-compute-ipmi.filters
 Source62:         baremetal-deploy-helper.filters
 Source63:         compute.filters
 Source64:         network.filters
+
+Source70:         guestfs.py
+Source71:         libguestfsmod.so
 
 
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}
@@ -482,17 +486,17 @@ install -p -D -m 644 %{SOURCE52} %{buildroot}%{_sysconfdir}/polkit-1/localauthor
 install -p -D -m 555 %{SOURCE54} %{buildroot}%{_bindir}/nova-rootwrap
 
 # Install rootwrap commands
-install -p -D -m 644 %{SOURCE60} %{_datarootdir}/nova/rootwrap/api-metadata.filters
-# install -p -D -m 644 %{SOURCE61} %{_datarootdir}/nova/rootwrap/baremetal-compute-ipmi.filters
-# install -p -D -m 644 %{SOURCE62} %{_datarootdir}/nova/rootwrap/baremetal-deploy-helper.filters
-install -p -D -m 644 %{SOURCE63} %{_datarootdir}/nova/rootwrap/compute.filters
-install -p -D -m 644 %{SOURCE64} %{_datarootdir}/nova/rootwrap/network.filters
+install -p -D -m 644 %{SOURCE60} %{buildroot}%{_datarootdir}/nova/rootwrap/api-metadata.filters
+# install -p -D -m 644 %{SOURCE61} %{buildroot}%{_datarootdir}/nova/rootwrap/baremetal-compute-ipmi.filters
+# install -p -D -m 644 %{SOURCE62} %{buildroot}%{_datarootdir}/nova/rootwrap/baremetal-deploy-helper.filters
+install -p -D -m 644 %{SOURCE63} %{buildroot}%{_datarootdir}/nova/rootwrap/compute.filters
+install -p -D -m 644 %{SOURCE64} %{buildroot}%{_datarootdir}/nova/rootwrap/network.filters
 
 # Network configuration templates for injection engine
 
 # python-libguestfs files
-install -p -D -m 644 guestfs.py %{buildroot}/opt/openstack/nova/venv/lib/python2.7/site-packages/guestfs.py
-install -p -D -m 644 libguestfsmod.so %{buildroot}/opt/openstack/nova/venv/lib64/python2.7/site-packages/libguestfsmod.so
+install -p -D -m 644 %{SOURCE70} %{buildroot}/opt/openstack/nova/venv/lib/python2.7/site-packages/guestfs.py
+install -p -D -m 644 %{SOURCE71} %{buildroot}/opt/openstack/nova/venv/lib64/python2.7/site-packages/libguestfsmod.so
 
 %clean
 rm -rf %{buildroot}
