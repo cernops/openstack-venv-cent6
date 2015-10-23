@@ -62,6 +62,14 @@ Source56:         api-paste.ini
 Source57:         nova.conf
 Source58:         rootwrap.conf
 
+
+Source60:         api-metadata.filters
+Source61:         baremetal-compute-ipmi.filters
+Source62:         baremetal-deploy-helper.filters
+Source63:         compute.filters
+Source64:         network.filters
+
+
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}
 
 BuildArch:        noarch
@@ -473,6 +481,14 @@ install -p -D -m 644 %{SOURCE52} %{buildroot}%{_sysconfdir}/polkit-1/localauthor
 # Install rootwrap files in /usr/share/nova/rootwrap
 install -p -D -m 555 %{SOURCE54} %{buildroot}%{_bindir}/nova-rootwrap
 
+# Install rootwrap commands
+install -p -D -m 644 %{SOURCE60} %{_datarootdir}/nova/rootwrap/api-metadata.filters
+# install -p -D -m 644 %{SOURCE61} %{_datarootdir}/nova/rootwrap/baremetal-compute-ipmi.filters
+# install -p -D -m 644 %{SOURCE62} %{_datarootdir}/nova/rootwrap/baremetal-deploy-helper.filters
+install -p -D -m 644 %{SOURCE63} %{_datarootdir}/nova/rootwrap/compute.filters
+install -p -D -m 644 %{SOURCE64} %{_datarootdir}/nova/rootwrap/network.filters
+
+
 # Network configuration templates for injection engine
 
 
@@ -540,7 +556,7 @@ mv -f /opt/openstack/%{python_name}/venv/bin/nova-rootwrap /opt/openstack/%{pyth
 
 
 %files compute
-#%{_datarootdir}/nova/rootwrap/compute.filters
+%{_datarootdir}/nova/rootwrap/compute.filters
 
 %if ! 0%{?usr_only}
 %if ! (0%{?rhel} > 6)
@@ -552,7 +568,7 @@ mv -f /opt/openstack/%{python_name}/venv/bin/nova-rootwrap /opt/openstack/%{pyth
 
 
 %files network
-#%{_datarootdir}/nova/rootwrap/network.filters
+%{_datarootdir}/nova/rootwrap/network.filters
 
 %if ! 0%{?usr_only}
 %if ! (0%{?rhel} > 6)
@@ -599,7 +615,7 @@ mv -f /opt/openstack/%{python_name}/venv/bin/nova-rootwrap /opt/openstack/%{pyth
 
 
 %files api
-#%{_datarootdir}/nova/rootwrap/api-metadata.filters
+%{_datarootdir}/nova/rootwrap/api-metadata.filters
 
 %if ! 0%{?usr_only}
 %if ! (0%{?rhel} > 6)
