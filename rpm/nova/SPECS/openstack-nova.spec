@@ -488,9 +488,11 @@ install -p -D -m 644 %{SOURCE60} %{_datarootdir}/nova/rootwrap/api-metadata.filt
 install -p -D -m 644 %{SOURCE63} %{_datarootdir}/nova/rootwrap/compute.filters
 install -p -D -m 644 %{SOURCE64} %{_datarootdir}/nova/rootwrap/network.filters
 
-
 # Network configuration templates for injection engine
 
+# python-libguestfs files
+install -p -D -m 644 guestfs.py %{buildroot}/opt/openstack/nova/venv/lib/python2.7/site-packages/guestfs.py
+install -p -D -m 644 libguestfsmod.so %{buildroot}/opt/openstack/nova/venv/lib64/python2.7/site-packages/libguestfsmod.so
 
 %clean
 rm -rf %{buildroot}
@@ -507,17 +509,17 @@ usermod -a -G qemu nova
 exit 0
 
 %post
-if %{_sbindir}/selinuxenabled; then
-    echo -e "\033[47m\033[1;31m***************************************************\033[0m"
-    echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31m                                                \033[47m\033[1;31m*\033[0m"
-    echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31m >> \033[5mYou have SELinux enabled on your host !\033[25m <<  \033[47m\033[1;31m*\033[0m"
-    echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31m                                                \033[47m\033[1;31m*\033[0m"
-    echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31mPlease disable it by setting \`SELINUX=disabled' \033[47m\033[1;31m*\033[0m"
-    echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31min /etc/sysconfig/selinux and don't forget      \033[47m\033[1;31m*\033[0m"
-    echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31mto reboot your host to apply that change!       \033[47m\033[1;31m*\033[0m"
-    echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31m                                                \033[47m\033[1;31m*\033[0m"
-    echo -e "\033[47m\033[1;31m***************************************************\033[0m"
-fi
+# if %{_sbindir}/selinuxenabled; then
+#     echo -e "\033[47m\033[1;31m***************************************************\033[0m"
+#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31m                                                \033[47m\033[1;31m*\033[0m"
+#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31m >> \033[5mYou have SELinux enabled on your host !\033[25m <<  \033[47m\033[1;31m*\033[0m"
+#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31m                                                \033[47m\033[1;31m*\033[0m"
+#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31mPlease disable it by setting \`SELINUX=disabled' \033[47m\033[1;31m*\033[0m"
+#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31min /etc/sysconfig/selinux and don't forget      \033[47m\033[1;31m*\033[0m"
+#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31mto reboot your host to apply that change!       \033[47m\033[1;31m*\033[0m"
+#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31m                                                \033[47m\033[1;31m*\033[0m"
+#     echo -e "\033[47m\033[1;31m***************************************************\033[0m"
+# fi
 
 %post -n python-nova
 mkdir -p /opt/openstack/%{python_name}
@@ -565,6 +567,11 @@ mv -f /opt/openstack/%{python_name}/venv/bin/nova-rootwrap /opt/openstack/%{pyth
 %{_unitdir}/%{daemon_prefix}-compute.service
 %endif
 %endif
+
+/opt/openstack/nova/venv/lib64/python2.7/site-packages/libguestfsmod.so
+/opt/openstack/nova/venv/lib/python2.7/site-packages/guestfs.py
+# /opt/openstack/nova/venv/lib/python2.7/site-packages/guestfs.pyc
+# /opt/openstack/nova/venv/lib/python2.7/site-packages/guestfs.pyo
 
 
 %files network
