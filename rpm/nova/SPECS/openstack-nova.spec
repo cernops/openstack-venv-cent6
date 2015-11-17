@@ -1,5 +1,3 @@
-%define _binaries_in_noarch_packages_terminate_build   0
-
 %global python_name nova
 %global daemon_prefix openstack-nova
 %global os_version 2015.1.1.dev450
@@ -71,9 +69,6 @@ Source62:         baremetal-deploy-helper.filters
 Source63:         compute.filters
 Source64:         network.filters
 
-Source70:         guestfs.py
-Source71:         libguestfsmod.so
-
 
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}
 
@@ -133,6 +128,7 @@ Requires:         curl
 Requires:         iscsi-initiator-utils
 Requires:         iptables iptables-ipv6
 Requires:         vconfig
+Requires:         python-libguestfs
 # tunctl is needed where `ip tuntap` is not available
 %if ! (0%{?fedora} > 12 || 0%{?rhel} > 6)
 Requires:         tunctl
@@ -495,10 +491,6 @@ install -p -D -m 644 %{SOURCE64} %{buildroot}%{_datarootdir}/nova/rootwrap/netwo
 
 # Network configuration templates for injection engine
 
-# python-libguestfs files
-install -p -D -m 644 %{SOURCE70} %{buildroot}/opt/openstack/nova/venv/lib/python2.7/site-packages/guestfs.py
-install -p -D -m 644 %{SOURCE71} %{buildroot}/opt/openstack/nova/venv/lib64/python2.7/site-packages/libguestfsmod.so
-
 %clean
 rm -rf %{buildroot}
 
@@ -513,18 +505,9 @@ exit 0
 usermod -a -G qemu nova
 exit 0
 
-%post
-# if %{_sbindir}/selinuxenabled; then
-#     echo -e "\033[47m\033[1;31m***************************************************\033[0m"
-#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31m                                                \033[47m\033[1;31m*\033[0m"
-#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31m >> \033[5mYou have SELinux enabled on your host !\033[25m <<  \033[47m\033[1;31m*\033[0m"
-#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31m                                                \033[47m\033[1;31m*\033[0m"
-#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31mPlease disable it by setting \`SELINUX=disabled' \033[47m\033[1;31m*\033[0m"
-#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31min /etc/sysconfig/selinux and don't forget      \033[47m\033[1;31m*\033[0m"
-#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31mto reboot your host to apply that change!       \033[47m\033[1;31m*\033[0m"
-#     echo -e "\033[47m\033[1;31m*\033[0m \033[40m\033[1;31m                                                \033[47m\033[1;31m*\033[0m"
-#     echo -e "\033[47m\033[1;31m***************************************************\033[0m"
-# fi
+%post compute
+ln -fs /usr/lib64/python2.6/site-packages/libguestfsmod.so /opt/openstack/nova/venv/lib64/python2.7/site-packages/libguestfsmod.so
+ln -fs /usr/lib/python2.6/site-packages/guestfs.py /opt/openstack/nova/venv/lib/python2.7/site-packages/guestfs.py
 
 %post -n python-nova
 mkdir -p /opt/openstack/%{python_name}
@@ -572,11 +555,6 @@ mv -f /opt/openstack/%{python_name}/venv/bin/nova-rootwrap /opt/openstack/%{pyth
 %{_unitdir}/%{daemon_prefix}-compute.service
 %endif
 %endif
-
-/opt/openstack/nova/venv/lib64/python2.7/site-packages/libguestfsmod.so
-/opt/openstack/nova/venv/lib/python2.7/site-packages/guestfs.py
-# /opt/openstack/nova/venv/lib/python2.7/site-packages/guestfs.pyc
-# /opt/openstack/nova/venv/lib/python2.7/site-packages/guestfs.pyo
 
 
 %files network
