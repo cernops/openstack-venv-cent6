@@ -2,7 +2,8 @@
 
 %global python_name nova
 %global daemon_prefix openstack-nova
-%global os_version 2015.1.1
+%global os_version 2015.1.1.dev450
+%global os_release 1
 %global no_tests $no_tests
 %global tests_data_dir %{_datarootdir}/%{python_name}-tests
 
@@ -14,7 +15,7 @@
 Name:             openstack-nova
 Summary:          OpenStack Compute (nova)
 Version:          %{os_version}
-Release:          1%{?dist}
+Release:          %{os_release}%{?dist}
 
 Group:            Development/Languages
 License:          ASL 2.0
@@ -368,7 +369,7 @@ This package contains the %{name} Python library.
 %install
 rm -rf %{buildroot}
 
-install -p -D -m 644 %{python_name}-%{os_version}-%{release}-venv.tar.gz %{buildroot}/opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{release}-venv.tar.gz
+install -p -D -m 644 %{python_name}-%{os_version}-%{os_release}-venv.tar.gz %{buildroot}/opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}-venv.tar.gz
 #make sure the /usr/share/nova dirs exist
 mkdir -p %{buildroot}/usr/share/nova/rootwrap
 mkdir -p %{buildroot}/usr/share/nova/interfaces
@@ -527,8 +528,8 @@ exit 0
 
 %post -n python-nova
 mkdir -p /opt/openstack/%{python_name}
-tar -zxvf /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{release}-venv.tar.gz -C /
-ln -fsn /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{release}-venv/venv /opt/openstack/%{python_name}/venv
+tar -zxvf /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}-venv.tar.gz -C /
+ln -fsn /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}-venv/venv /opt/openstack/%{python_name}/venv
 mv -f /opt/openstack/%{python_name}/venv/bin/nova-rootwrap /opt/openstack/%{python_name}/venv/bin/nova-rootwrap-real
 
 %files
