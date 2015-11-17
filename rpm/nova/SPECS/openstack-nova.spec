@@ -511,7 +511,7 @@ ln -fs /usr/lib/python2.6/site-packages/guestfs.py /opt/openstack/nova/venv/lib/
 
 %post -n python-nova
 mkdir -p /opt/openstack/%{python_name}
-tar -zxvf /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}-venv.tar.gz -C /
+tar -zxvf /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}-venv.tar.gz -C / > /dev/null
 ln -fsn /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}-venv/venv /opt/openstack/%{python_name}/venv
 mv -f /opt/openstack/%{python_name}/venv/bin/nova-rootwrap /opt/openstack/%{python_name}/venv/bin/nova-rootwrap-real
 

@@ -346,7 +346,7 @@ exit 0
 
 %post -n python-ceilometer
 mkdir -p /opt/openstack/%{python_name}
-tar -zxvf /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{release}-venv.tar.gz -C /
+tar -zxvf /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{release}-venv.tar.gz -C / > /dev/null
 ln -fsn /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{release}-venv/venv /opt/openstack/%{python_name}/venv
 
 %files -n python-ceilometer
