@@ -98,13 +98,16 @@ Group:            Applications/System
 
 Requires:         python-nova = %{version}-%{release}
 
-%if ! 0%{?usr_only}
-Requires(post):   chkconfig
+%if 0%{?rhel} && 0%{?rhel} <= 6
 Requires(postun): initscripts
 Requires(preun):  chkconfig
-Requires(pre):    shadow-utils
+%else
+Requires(post):   systemd
+Requires(preun):  systemd
+Requires(postun): systemd
+BuildRequires:    systemd
 %endif
-
+Requires(pre):    shadow-utils
 
 %description common
 OpenStack Compute (codename Nova) is open source software designed to
@@ -514,6 +517,284 @@ mkdir -p /opt/openstack/%{python_name}
 tar -zxvf /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}-venv.tar.gz -C / > /dev/null
 ln -fsn /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}-venv/venv /opt/openstack/%{python_name}/venv
 mv -f /opt/openstack/%{python_name}/venv/bin/nova-rootwrap /opt/openstack/%{python_name}/venv/bin/nova-rootwrap-real
+
+%preun compute
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in compute; do
+        /sbin/service %{name}-${svc} stop >/dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-compute.service
+%endif
+
+%preun network
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in network; do
+        /sbin/service %{name}-${svc} stop >/dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-network.service
+%endif
+
+%preun scheduler
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in scheduler; do
+        /sbin/service %{name}-${svc} stop >/dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-scheduler.service
+%endif
+
+%preun cert
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in cert; do
+        /sbin/service %{name}-${svc} stop >/dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-cert.service
+%endif
+
+%preun api
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in api metadata-api; do
+        /sbin/service %{name}-${svc} stop >/dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-api.service %{name}-metadata-api.service
+%endif
+
+%preun objectstore
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in objectstore; do
+        /sbin/service %{name}-${svc} stop >/dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-objectstore.service
+%endif
+
+%preun conductor
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in conductor; do
+        /sbin/service %{name}-${svc} stop >/dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-conductor.service
+%endif
+
+%preun console
+%systemd_preun %{name}-console.service %{name}-consoleauth.service %{name}-xvpvncproxy.service
+%preun cells
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in cells; do
+        /sbin/service %{name}-${svc} stop >/dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-cells.service
+%endif
+
+%preun novncproxy
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in novncproxy; do
+        /sbin/service %{name}-${svc} stop >/dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-novncproxy.service
+%endif
+
+%preun spicehtml5proxy
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in spicehtml5proxy; do
+        /sbin/service %{name}-${svc} stop >/dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-spicehtml5proxy.service
+%endif
+
+%preun serialproxy
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in serialproxy; do
+        /sbin/service %{name}-${svc} stop >/dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-serialproxy.service
+%endif
+
+%postun compute
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # package upgrade, not uninstall
+    for svc in compute; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-compute.service
+%endif
+
+%postun network
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # package upgrade, not uninstall
+    for svc in network; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-network.service
+%endif
+
+%postun scheduler
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # package upgrade, not uninstall
+    for svc in scheduler; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-scheduler.service
+%endif
+
+%postun cert
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # package upgrade, not uninstall
+    for svc in cert; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-cert.service
+%endif
+
+%postun api
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # package upgrade, not uninstall
+    for svc in api metadata-api; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-api.service %{name}-metadata-api.service
+%endif
+
+%postun objectstore
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # package upgrade, not uninstall
+    for svc in objectstore; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-objectstore.service
+%endif
+
+%postun conductor
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # package upgrade, not uninstall
+    for svc in conductor; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-conductor.service
+%endif
+
+%postun console
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # package upgrade, not uninstall
+    for svc in console consoleauth xvpvncproxy spicehtml5proxy; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-console.service %{name}-consoleauth.service %{name}-xvpvncproxy.service
+%endif
+
+%postun cells
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # package upgrade, not uninstall
+    for svc in cells; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-cells.service
+%endif
+
+%postun novncproxy
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # package upgrade, not uninstall
+    for svc in novncproxy; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-novncproxy.service
+%endif
+
+%postun spicehtml5proxy
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # package upgrade, not uninstall
+    for svc in spicehtml5proxy; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-spicehtml5proxy.service
+%endif
+
+%postun serialproxy
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # package upgrade, not uninstall
+    for svc in serialproxy; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-serialproxy.service
+%endif
 
 %files
 
