@@ -98,6 +98,16 @@ Group:            Applications/System
 
 Requires:         python-ceilometer = %{version}-%{release}
 
+%if 0%{?rhel} && 0%{?rhel} <= 6
+Requires(post):   chkconfig
+Requires(postun): initscripts
+Requires(preun):  chkconfig
+%else
+Requires(post):   systemd-units
+Requires(preun):  systemd-units
+Requires(postun): systemd-units
+%endif
+
 Requires(pre):    shadow-utils
 
 %description common
@@ -326,6 +336,274 @@ if ! getent passwd ceilometer >/dev/null; then
 fi
 exit 0
 
+
+%post compute
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 1 ] ; then
+    # Initial installation
+    /sbin/chkconfig --add %{name}-compute
+fi
+%else
+%systemd_post %{name}-compute.service
+%endif
+
+%post collector
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 1 ] ; then
+    # Initial installation
+    /sbin/chkconfig --add %{name}-collector
+fi
+%else
+%systemd_post %{name}-collector.service
+%endif
+
+%post notification
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 1 ] ; then
+    # Initial installation
+    /sbin/chkconfig --add %{name}-notification
+fi
+%else
+%systemd_post %{name}-notification.service
+%endif
+
+%post api
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 1 ] ; then
+    # Initial installation
+    /sbin/chkconfig --add %{name}-api
+fi
+%else
+%systemd_post %{name}-api.service
+%endif
+
+%post central
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 1 ] ; then
+    # Initial installation
+    /sbin/chkconfig --add %{name}-central
+fi
+%else
+%systemd_post %{name}-central.service
+%endif
+
+%post alarm
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 1 ] ; then
+    # Initial installation
+    for svc in alarm-notifier alarm-evaluator; do
+        /sbin/chkconfig --add %{name}-${svc}
+    done
+fi
+%else
+%systemd_post %{name}-alarm-notifier.service %{name}-alarm-evaluator.service
+%endif
+
+%post ipmi
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 1 ] ; then
+    # Initial installation
+    /sbin/chkconfig --add %{name}-ipmi
+fi
+%else
+%systemd_post %{name}-alarm-ipmi.service
+%endif
+
+
+%preun compute
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in compute; do
+        /sbin/service %{name}-${svc} stop > /dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-compute.service
+%endif
+
+%preun collector
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in collector; do
+        /sbin/service %{name}-${svc} stop > /dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-collector.service
+%endif
+
+%preun notification
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in notification; do
+        /sbin/service %{name}-${svc} stop > /dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-notification.service
+%endif
+
+%preun api
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in api; do
+        /sbin/service %{name}-${svc} stop > /dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-api.service
+%endif
+
+%preun central
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in central; do
+        /sbin/service %{name}-${svc} stop > /dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-central.service
+%endif
+
+%preun alarm
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in alarm-notifier alarm-evaluator; do
+        /sbin/service %{name}-${svc} stop > /dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-alarm-notifier.service %{name}-alarm-evaluator.service
+%endif
+
+%preun ipmi
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in ipmi; do
+        /sbin/service %{name}-${svc} stop > /dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-ipmi.service
+%endif
+
+%preun polling
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -eq 0 ] ; then
+    for svc in ipmi; do
+        /sbin/service %{name}-${svc} stop > /dev/null 2>&1
+        /sbin/chkconfig --del %{name}-${svc}
+    done
+fi
+%else
+%systemd_preun %{name}-polling.service
+%endif
+
+
+%postun compute
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    for svc in compute; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-compute.service
+%endif
+
+%postun collector
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    for svc in collector; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-collector.service
+%endif
+
+%postun notification
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    for svc in notification; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-notification.service
+%endif
+
+%postun api
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    for svc in api; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-api.service
+%endif
+
+%postun central
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    for svc in central; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-central.service
+%endif
+
+%postun alarm
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    for svc in alarm-notifier alarm-evaluator; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-alarm-notifier.service %{name}-alarm-evaluator.service
+%endif
+
+%postun ipmi
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    for svc in ipmi; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-ipmi.service
+%endif
+
+%postun polling
+%if 0%{?rhel} && 0%{?rhel} <= 6
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    for svc in ipmi; do
+        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
+    done
+fi
+%else
+%systemd_postun_with_restart %{name}-polling.service
+%endif
+
+
 %files common
 %dir %{_sysconfdir}/ceilometer
 #if $older_than('2014.2')
@@ -366,55 +644,11 @@ ln -fsn /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}
 %{_unitdir}/%{name}-compute.service
 %endif
 
-%if 0%{?rhel} > 6
-%post compute
-if [ $1 -eq 1 ] ; then
-        # Initial installation
-        /usr/bin/systemctl preset %{name}-compute.service
-fi
-
-%preun compute
-if [ $1 -eq 0 ] ; then
-        # Package removal, not upgrade
-        /usr/bin/systemctl --no-reload disable %{name}-compute.service > /dev/null 2>&1 || :
-        /usr/bin/systemctl stop %{name}-compute.service > /dev/null 2>&1 || :
-fi
-
-%postun compute
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-if [ $1 -ge 1 ] ; then
-        # Package upgrade, not uninstall
-        /usr/bin/systemctl try-restart %{name}-compute.service #>/dev/null 2>&1 || :
-fi
-%endif
-
 %files collector
 %if ! (0%{?rhel} > 6)
 %{_initrddir}/%{name}-collector
 %else
 %{_unitdir}/%{name}-collector.service
-%endif
-
-%if 0%{?rhel} > 6
-%post collector
-if [ $1 -eq 1 ] ; then
-        # Initial installation
-        /usr/bin/systemctl preset %{name}-collector.service
-fi
-
-%preun collector
-if [ $1 -eq 0 ] ; then
-        # Package removal, not upgrade
-        /usr/bin/systemctl --no-reload disable %{name}-collector.service > /dev/null 2>&1 || :
-        /usr/bin/systemctl stop %{name}-collector.service > /dev/null 2>&1 || :
-fi
-
-%postun collector
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-if [ $1 -ge 1 ] ; then
-        # Package upgrade, not uninstall
-        /usr/bin/systemctl try-restart %{name}-collector.service #>/dev/null 2>&1 || :
-fi
 %endif
 
 %files api
@@ -424,55 +658,11 @@ fi
 %{_unitdir}/%{name}-api.service
 %endif
 
-%if 0%{?rhel} > 6
-%post api
-if [ $1 -eq 1 ] ; then
-        # Initial installation
-        /usr/bin/systemctl preset %{name}-api.service
-fi
-
-%preun api
-if [ $1 -eq 0 ] ; then
-        # Package removal, not upgrade
-        /usr/bin/systemctl --no-reload disable %{name}-api.service > /dev/null 2>&1 || :
-        /usr/bin/systemctl stop %{name}-api.service > /dev/null 2>&1 || :
-fi
-
-%postun api
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-if [ $1 -ge 1 ] ; then
-        # Package upgrade, not uninstall
-        /usr/bin/systemctl try-restart %{name}-api.service #>/dev/null 2>&1 || :
-fi
-%endif
-
 %files central
 %if ! (0%{?rhel} > 6)
 %{_initrddir}/%{name}-central
 %else
 %{_unitdir}/%{name}-central.service
-%endif
-
-%if 0%{?rhel} > 6
-%post central
-if [ $1 -eq 1 ] ; then
-        # Initial installation
-        /usr/bin/systemctl preset %{name}-central.service
-fi
-
-%preun central
-if [ $1 -eq 0 ] ; then
-        # Package removal, not upgrade
-        /usr/bin/systemctl --no-reload disable %{name}-central.service > /dev/null 2>&1 || :
-        /usr/bin/systemctl stop %{name}-central.service > /dev/null 2>&1 || :
-fi
-
-%postun central
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-if [ $1 -ge 1 ] ; then
-        # Package upgrade, not uninstall
-        /usr/bin/systemctl try-restart %{name}-central.service #>/dev/null 2>&1 || :
-fi
 %endif
 
 %files alarm
@@ -484,33 +674,6 @@ fi
 %{_unitdir}/%{name}-alarm-evaluator.service
 %endif
 
-%if 0%{?rhel} > 6
-%post alarm
-if [ $1 -eq 1 ] ; then
-        # Initial installation
-        /usr/bin/systemctl preset %{name}-alarm-notifier.service
-        /usr/bin/systemctl preset %{name}-alarm-evaluator.service
-fi
-
-%preun alarm
-if [ $1 -eq 0 ] ; then
-        # Package removal, not upgrade
-        /usr/bin/systemctl --no-reload disable %{name}-alarm-notifier.service > /dev/null 2>&1 || :
-        /usr/bin/systemctl stop %{name}-alarm-notifier.service > /dev/null 2>&1 || :
-        /usr/bin/systemctl --no-reload disable %{name}-alarm-evaluator.service > /dev/null 2>&1 || :
-        /usr/bin/systemctl stop %{name}-alarm-evaluator.service > /dev/null 2>&1 || :
-fi
-
-%postun alarm
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-if [ $1 -ge 1 ] ; then
-        # Package upgrade, not uninstall
-        /usr/bin/systemctl try-restart %{name}-alarm-notifier.service #>/dev/null 2>&1 || :
-        /usr/bin/systemctl try-restart %{name}-alarm-evaluator.service #>/dev/null 2>&1 || :
-fi
-%endif
-
-#if $newer_than_eq('2014.1')
 %files notification
 %if ! (0%{?rhel} > 6)
 %{_initrddir}/%{name}-notification
@@ -518,30 +681,6 @@ fi
 %{_unitdir}/%{name}-notification.service
 %endif
 
-%if 0%{?rhel} > 6
-%post notification
-if [ $1 -eq 1 ] ; then
-        # Initial installation
-        /usr/bin/systemctl preset %{name}-notification.service
-fi
-
-%preun notification
-if [ $1 -eq 0 ] ; then
-        # Package removal, not upgrade
-        /usr/bin/systemctl --no-reload disable %{name}-notification.service > /dev/null 2>&1 || :
-        /usr/bin/systemctl stop %{name}-notification.service > /dev/null 2>&1 || :
-fi
-
-%postun notification
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-if [ $1 -ge 1 ] ; then
-        # Package upgrade, not uninstall
-        /usr/bin/systemctl try-restart %{name}-notification.service #>/dev/null 2>&1 || :
-fi
-%endif
-#end if
-
-#if $newer_than_eq('2014.2')
 %files ipmi
 %if 0%{?rhel} && 0%{?rhel} <= 6
 %{_initrddir}/%{name}-ipmi
@@ -549,58 +688,11 @@ fi
 %{_unitdir}/%{name}-ipmi.service
 %endif
 
-%if 0%{?rhel} > 6
-%post ipmi
-if [ $1 -eq 1 ] ; then
-        # Initial installation
-        /usr/bin/systemctl preset %{name}-ipmi.service
-fi
-
-%preun ipmi
-if [ $1 -eq 0 ] ; then
-        # Package removal, not upgrade
-        /usr/bin/systemctl --no-reload disable %{name}-ipmi.service > /dev/null 2>&1 || :
-        /usr/bin/systemctl stop %{name}-ipmi.service > /dev/null 2>&1 || :
-fi
-
-%postun ipmi
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-if [ $1 -ge 1 ] ; then
-        # Package upgrade, not uninstall
-        /usr/bin/systemctl try-restart %{name}-ipmi.service #>/dev/null 2>&1 || :
-fi
-%endif
-#end if
-
-#if $newer_than_eq('2015.1')
 %files polling
 %if 0%{?rhel} && 0%{?rhel} <= 6
 %{_initrddir}/%{name}-polling
 %else
 %{_unitdir}/%{name}-polling.service
 %endif
-
-%if 0%{?rhel} > 6
-%post polling
-if [ $1 -eq 1 ] ; then
-        # Initial installation
-        /usr/bin/systemctl preset %{name}-polling.service
-fi
-
-%preun polling
-if [ $1 -eq 0 ] ; then
-        # Package removal, not upgrade
-        /usr/bin/systemctl --no-reload disable %{name}-polling.service > /dev/null 2>&1 || :
-        /usr/bin/systemctl stop %{name}-polling.service > /dev/null 2>&1 || :
-fi
-
-%postun polling
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-if [ $1 -ge 1 ] ; then
-        # Package upgrade, not uninstall
-        /usr/bin/systemctl try-restart %{name}-polling.service #>/dev/null 2>&1 || :
-fi
-%endif
-#end if
 
 %changelog
