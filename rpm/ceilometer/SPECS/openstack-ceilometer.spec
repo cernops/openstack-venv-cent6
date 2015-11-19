@@ -1,6 +1,7 @@
 %global python_name ceilometer
 %global daemon_prefix openstack-ceilometer
 %global os_version 2015.1.1
+%global os_release 1
 %global _without_doc 1
 %global with_doc %{!?_without_doc:1}%{?_without_doc:0}
 
@@ -12,7 +13,7 @@
 
 Name:             openstack-ceilometer
 Version:          %{os_version}
-Release:          1
+Release:          %{os_release}%{?dist}
 Summary:          OpenStack measurement collection service
 
 Group:            Applications/System
@@ -222,7 +223,7 @@ This package contains the polling service.
 
 %install
 
-install -p -D -m 644 %{python_name}-%{os_version}-%{release}-venv.tar.gz %{buildroot}/opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{release}-venv.tar.gz
+install -p -D -m 644 %{python_name}-%{os_version}-%{os_release}-venv.tar.gz %{buildroot}/opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}-venv.tar.gz
 #make sure the /usr/share/ceilometer dirs exist
 mkdir -p %{buildroot}/usr/share/ceilometer
 
@@ -346,8 +347,8 @@ exit 0
 
 %post -n python-ceilometer
 mkdir -p /opt/openstack/%{python_name}
-tar -zxvf /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{release}-venv.tar.gz -C / > /dev/null
-ln -fsn /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{release}-venv/venv /opt/openstack/%{python_name}/venv
+tar -zxvf /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}-venv.tar.gz -C / > /dev/null
+ln -fsn /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}-venv/venv /opt/openstack/%{python_name}/venv
 
 %files -n python-ceilometer
 #venv tarball
