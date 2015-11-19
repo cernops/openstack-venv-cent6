@@ -7,11 +7,12 @@
 
 venvdir="/opt/openstack/ceilometer/venv"
 
-prog=openstack-ceilometer-compute
-exec="$venvdir/bin/ceilometer-agent-compute"
-pidfile="/var/run/ceilometer/$prog.pid"
+suffix=compute
+prog=openstack-ceilometer-$suffix
+exec="$venvdir/bin/ceilometer-agent-$suffix"
+pidfile="/var/run/ceilometer/ceilometer-$suffix.pid"
 daemon_user=ceilometer
-daemon_args=''
+daemon_args="--logfile /var/log/ceilometer/$suffix.log"
 
 [ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
 
