@@ -12,7 +12,7 @@ prog=openstack-nova-$suffix
 exec="$venvdir/bin/nova-$suffix"
 pidfile="/var/run/nova/nova-$suffix.pid"
 daemon_user=nova
-daemon_args="--logfile /var/log/nova/$suffix.log"
+daemon_args="--logfile /var/log/nova/$suffix.log --config-file /etc/nova/nova.conf --config-file /etc/nova/nova-static.conf"
 
 [ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
 
