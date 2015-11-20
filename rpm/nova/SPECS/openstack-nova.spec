@@ -584,20 +584,6 @@ done
 %systemd_post %{name}-cells.service
 %endif
 
-%post novncproxy
-%if 0%{?rhel} && 0%{?rhel} <= 6
-/sbin/chkconfig --add %{name}-novncproxy
-%else
-%systemd_post %{name}-novncproxy.service
-%endif
-
-%post spicehtml5proxy
-%if 0%{?rhel} && 0%{?rhel} <= 6
-/sbin/chkconfig --add %{name}-spicehtml5proxy
-%else
-%systemd_post %{name}-spicehtml5proxy.service
-%endif
-
 %post serialproxy
 %if 0%{?rhel} && 0%{?rhel} <= 6
 /sbin/chkconfig --add %{name}-serialproxy
@@ -701,30 +687,6 @@ if [ $1 -eq 0 ] ; then
 fi
 %else
 %systemd_preun %{name}-cells.service
-%endif
-
-%preun novncproxy
-%if 0%{?rhel} && 0%{?rhel} <= 6
-if [ $1 -eq 0 ] ; then
-    for svc in novncproxy; do
-        /sbin/service %{name}-${svc} stop >/dev/null 2>&1
-        /sbin/chkconfig --del %{name}-${svc}
-    done
-fi
-%else
-%systemd_preun %{name}-novncproxy.service
-%endif
-
-%preun spicehtml5proxy
-%if 0%{?rhel} && 0%{?rhel} <= 6
-if [ $1 -eq 0 ] ; then
-    for svc in spicehtml5proxy; do
-        /sbin/service %{name}-${svc} stop >/dev/null 2>&1
-        /sbin/chkconfig --del %{name}-${svc}
-    done
-fi
-%else
-%systemd_preun %{name}-spicehtml5proxy.service
 %endif
 
 %preun serialproxy
@@ -845,30 +807,6 @@ if [ $1 -ge 1 ] ; then
 fi
 %else
 %systemd_postun_with_restart %{name}-cells.service
-%endif
-
-%postun novncproxy
-%if 0%{?rhel} && 0%{?rhel} <= 6
-if [ $1 -ge 1 ] ; then
-    # package upgrade, not uninstall
-    for svc in novncproxy; do
-        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
-    done
-fi
-%else
-%systemd_postun_with_restart %{name}-novncproxy.service
-%endif
-
-%postun spicehtml5proxy
-%if 0%{?rhel} && 0%{?rhel} <= 6
-if [ $1 -ge 1 ] ; then
-    # package upgrade, not uninstall
-    for svc in spicehtml5proxy; do
-        /sbin/service %{name}-${svc} condrestart > /dev/null 2>&1 || :
-    done
-fi
-%else
-%systemd_postun_with_restart %{name}-spicehtml5proxy.service
 %endif
 
 %postun serialproxy
