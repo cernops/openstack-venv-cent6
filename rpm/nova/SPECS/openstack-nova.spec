@@ -512,11 +512,98 @@ exit 0
 ln -fs /usr/lib64/python2.6/site-packages/libguestfsmod.so /opt/openstack/nova/venv/lib64/python2.7/site-packages/libguestfsmod.so
 ln -fs /usr/lib/python2.6/site-packages/guestfs.py /opt/openstack/nova/venv/lib/python2.7/site-packages/guestfs.py
 
+%if 0%{?rhel} && 0%{?rhel} <= 6
+/sbin/chkconfig --add %{name}-compute
+%else
+%systemd_post %{name}-compute.service
+%endif
+
 %post -n python-nova
 mkdir -p /opt/openstack/%{python_name}
 tar -zxvf /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}-venv.tar.gz -C / > /dev/null
 ln -fsn /opt/openstack/%{python_name}/%{python_name}-%{os_version}-%{os_release}-venv/venv /opt/openstack/%{python_name}/venv
 mv -f /opt/openstack/%{python_name}/venv/bin/nova-rootwrap /opt/openstack/%{python_name}/venv/bin/nova-rootwrap-real
+
+%post network
+%if 0%{?rhel} && 0%{?rhel} <= 6
+/sbin/chkconfig --add %{name}-network
+%else
+%systemd_post %{name}-network.service
+%endif
+
+%post scheduler
+%if 0%{?rhel} && 0%{?rhel} <= 6
+/sbin/chkconfig --add %{name}-scheduler
+%else
+%systemd_post %{name}-scheduler.service
+%endif
+
+%post cert
+%if 0%{?rhel} && 0%{?rhel} <= 6
+/sbin/chkconfig --add %{name}-cert
+%else
+%systemd_post %{name}-cert.service
+%endif
+
+%post api
+%if 0%{?rhel} && 0%{?rhel} <= 6
+for svc in api metadata-api; do
+    /sbin/chkconfig --add %{name}-$svc
+done
+%else
+%systemd_post %{name}-api.service %{name}-metadata-api.service
+%endif
+
+%post conductor
+%if 0%{?rhel} && 0%{?rhel} <= 6
+/sbin/chkconfig --add %{name}-conductor
+%else
+%systemd_post %{name}-conductor.service
+%endif
+
+%post objectstore
+%if 0%{?rhel} && 0%{?rhel} <= 6
+/sbin/chkconfig --add %{name}-objectstore
+%else
+%systemd_post %{name}-objectstore.service
+%endif
+
+%post console
+%if 0%{?rhel} && 0%{?rhel} <= 6
+for svc in console consoleauth xvpvncproxy spicehtml5proxy; do
+    /sbin/chkconfig --add %{name}-$svc
+done
+%else
+%systemd_post %{name}-console.service %{name}-consoleauth.service %{name}-xvpvncproxy.service
+%endif
+
+%post cells
+%if 0%{?rhel} && 0%{?rhel} <= 6
+/sbin/chkconfig --add %{name}-cells
+%else
+%systemd_post %{name}-cells.service
+%endif
+
+%post novncproxy
+%if 0%{?rhel} && 0%{?rhel} <= 6
+/sbin/chkconfig --add %{name}-novncproxy
+%else
+%systemd_post %{name}-novncproxy.service
+%endif
+
+%post spicehtml5proxy
+%if 0%{?rhel} && 0%{?rhel} <= 6
+/sbin/chkconfig --add %{name}-spicehtml5proxy
+%else
+%systemd_post %{name}-spicehtml5proxy.service
+%endif
+
+%post serialproxy
+%if 0%{?rhel} && 0%{?rhel} <= 6
+/sbin/chkconfig --add %{name}-serialproxy
+%else
+%systemd_post %{name}-serialproxy.service
+%endif
 
 %preun compute
 %if 0%{?rhel} && 0%{?rhel} <= 6
