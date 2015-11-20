@@ -7,11 +7,12 @@
 
 venvdir="/opt/openstack/nova/venv"
 
-prog=openstack-nova-cells
-exec="$venvdir/bin/nova-cells"
-pidfile="/var/run/nova/$prog.pid"
+suffix=cells
+prog=openstack-nova-$suffix
+exec="$venvdir/bin/nova-$suffix"
+pidfile="/var/run/nova/nova-$suffix.pid"
 daemon_user=nova
-daemon_args=''
+daemon_args="--logfile /var/log/nova/$suffix.log"
 
 [ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
 
